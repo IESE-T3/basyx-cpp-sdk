@@ -226,11 +226,9 @@ void XMLDeSerializer::deSerializeDerivedFrom(xml_node node,
                                              AssetAdministrationShell & a) {
    xml_node derivedFrom_node = findChildByName(node, XML_derivedFrom);
    if (derivedFrom_node.root()) {
-      util::optional<Reference> r =
-            deSerializeReferenceFromParent(derivedFrom_node);
-      if (r.has_value()) {
-         Reference dr = r.value();
-         a.setDerivedFrom(dr);
+      util::optional<Reference> ref = deSerializeReferenceFromParent(derivedFrom_node);
+      if (ref) {
+         a.derivedFrom = std::move(ref);
       }
    }
 }
@@ -417,18 +415,15 @@ util::optional<Reference> XMLDeSerializer::deSerializeReference(xml_node node) {
 
 Key XMLDeSerializer::deSerializeKey(xml_node node) {
    std::string content = deSerializeString(node);
-
-   Key k(content);
-
    xml_attribute type_attr = findAttributeByName(node, XML_ATTR_type);
    KeyElements ke = KeyElements_::from_string(type_attr.as_string());
-   k.set_type(ke);
+
+   Key k(ke, content);
 
    // Legacy version 2.0 metamodel
    xml_attribute idType_attr = findAttributeByName(node, XML_ATTR_idType);
    if (!idType_attr.empty()) {
       KeyType kt = KeyType_::from_string(idType_attr.as_string());
-      k.set_id_type(kt);
    }
 
    return k;

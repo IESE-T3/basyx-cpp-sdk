@@ -18,7 +18,7 @@ class File :
 	private ModelType<ModelTypes::File>,
 	private serialization::Serializable<File>
 {
-private:
+public:
 	std::string mimeType;
 	util::optional<std::string> value;
 public:
@@ -35,14 +35,6 @@ public:
 	~File() = default;
 public:
 	using ModelType::get_model_type;
-public:
-	const util::optional<std::string> & getValue() const;
-	util::optional<std::string> & getValue();
-	void setValue(util::string_view value);
-
-	const std::string & getMimeType() const;
-	std::string & getMimeType();
-	void setMimeType(util::string_view mimeType);
 };
 
 }

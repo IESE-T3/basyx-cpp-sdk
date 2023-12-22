@@ -22,17 +22,17 @@ using namespace basyx;
 
 class ElementContainerTest : public ::testing::Test {
 protected:
-    // Test settings
+	// Test settings
 
-    // Test variables
+	// Test variables
 
-    virtual void SetUp()
-    {
-    }
+	virtual void SetUp()
+	{
+	}
 
-    virtual void TearDown()
-    {
-    }
+	virtual void TearDown()
+	{
+	}
 };
 
 TEST_F(ElementContainerTest, Constructor_1)
@@ -44,13 +44,13 @@ TEST_F(ElementContainerTest, Constructor_1)
 TEST_F(ElementContainerTest, Constructor_2)
 {
 	ElementContainer<SubmodelElement> container_1{
-		Property<int>("int", 2)
+		Property("int", 2)
 	};
 	ASSERT_EQ(container_1.size(), 1);
 
 	ElementContainer<SubmodelElement> container_2{
-		Property<int>("int", 2),
-		Property<float>("float", 2.0f),
+		Property("int", 2),
+		Property("float", 2.0f),
 	};
 	ASSERT_EQ(container_2.size(), 2);
 }
@@ -58,8 +58,8 @@ TEST_F(ElementContainerTest, Constructor_2)
 TEST_F(ElementContainerTest, CopyConstructor)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ElementContainer<SubmodelElement> container_2(container);
 
@@ -69,8 +69,8 @@ TEST_F(ElementContainerTest, CopyConstructor)
 TEST_F(ElementContainerTest, MoveConstructor)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ElementContainer<SubmodelElement> container_2 = std::move(container);
 
@@ -83,11 +83,11 @@ TEST_F(ElementContainerTest, AddElement_1)
 	ElementContainer<SubmodelElement> container;
 	ASSERT_EQ(container.size(), 0);
 
-	auto prop = container.add(Property<int>("intProp", 2));
+	auto prop = container.add(Property("intProp", 2));
 	ASSERT_EQ(container.size(), 1);
 	ASSERT_EQ(prop->getIdShort(), "intProp");
 
-	auto prop_ptr = std::make_unique<Property<int>>("intProp2", 2);
+	auto prop_ptr = std::make_unique<Property>("intProp2", 2);
 	auto prop_2 = container.add(std::move(prop_ptr));
 	ASSERT_EQ(container.size(), 2);
 	ASSERT_EQ(prop_2->getIdShort(), "intProp2");
@@ -98,10 +98,10 @@ TEST_F(ElementContainerTest, AddElement_2)
 	ElementContainer<SubmodelElement> container;
 	ASSERT_EQ(container.size(), 0);
 
-	container.add(Property<int>("intProp", 2));
+	container.add(Property("intProp", 2));
 	ASSERT_EQ(container.size(), 1);
 
-	auto no_prop = container.add(Property<int>("intProp", 5));
+	auto no_prop = container.add(Property("intProp", 5));
 	ASSERT_EQ(container.size(), 1);
 	ASSERT_EQ(no_prop, nullptr);
 }
@@ -111,10 +111,10 @@ TEST_F(ElementContainerTest, CreateElement_1)
 	ElementContainer<SubmodelElement> container;
 	ASSERT_EQ(container.size(), 0);
 
-	container.create<Property<int>>("intProp", 2);
+	container.create<Property>("intProp", 2);
 	ASSERT_EQ(container.size(), 1);
 
-	auto no_prop = container.add(Property<int>("intProp", 5));
+	auto no_prop = container.add(Property("intProp", 5));
 	ASSERT_EQ(container.size(), 1);
 	ASSERT_EQ(no_prop, nullptr);
 }
@@ -123,7 +123,7 @@ TEST_F(ElementContainerTest, HasEntry)
 {
 	ElementContainer<SubmodelElement> container;
 	ASSERT_FALSE(container.hasEntry("intProp"));
-	container.add(Property<int>("intProp", 2));
+	container.add(Property("intProp", 2));
 	ASSERT_TRUE(container.hasEntry("intProp"));
 }
 
@@ -136,8 +136,8 @@ TEST_F(ElementContainerTest, GetElement_1)
 TEST_F(ElementContainerTest, GetElement_2)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	auto prop_1 = container.get("intProp1");
 	ASSERT_EQ(prop_1->getIdShort(), "intProp1");
@@ -146,12 +146,12 @@ TEST_F(ElementContainerTest, GetElement_2)
 TEST_F(ElementContainerTest, GetElement_3)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
+	container.add(Property("intProp1", 2));
 
-	auto ok_prop = container.get<Property<int>>("intProp1");
+	auto ok_prop = container.get<Property>("intProp1");
 	ASSERT_NE(ok_prop, nullptr);
 	ASSERT_EQ(ok_prop->getIdShort(), "intProp1");
-	ASSERT_EQ(*ok_prop->get_value(), 2);
+	ASSERT_EQ(ok_prop->get_as<DataTypeDefinition::Integer>(), 2);
 
 	auto wrong_prop = container.get<MultiLanguageProperty>("intProp1");
 	ASSERT_EQ(wrong_prop, nullptr);
@@ -160,28 +160,27 @@ TEST_F(ElementContainerTest, GetElement_3)
 TEST_F(ElementContainerTest, GetElement_4)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<std::string>("stringProp", "test"));
+	container.add(Property("stringProp", "test"));
 
-	auto prop = container.get<Property<std::string>>("stringProp");
+	auto prop = container.get<Property>("stringProp");
 	ASSERT_NE(prop, nullptr);
-	ASSERT_EQ(prop->get_value(), "test");
-	int j = 2;
+	ASSERT_EQ(prop->get_value_string(), "test");
 }
 
 TEST_F(ElementContainerTest, Iteration)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 1));
-	container.add(Property<int>("intProp2", 2));
-	container.add(Property<int>("intProp3", 3));
-	container.add(Property<int>("intProp4", 4));
+	container.add(Property("intProp1", 1));
+	container.add(Property("intProp2", 2));
+	container.add(Property("intProp3", 3));
+	container.add(Property("intProp4", 4));
 
 	bool prop1_found = false;
 	bool prop2_found = false;
 	bool prop3_found = false;
 	bool prop4_found = false;
 
-	for (const auto & entry : container) {
+	for (const auto& entry : container) {
 		if (entry->getIdShort() == "intProp1")
 			prop1_found = true;
 
@@ -203,10 +202,10 @@ TEST_F(ElementContainerTest, SubClass)
 	ElementContainer<DataElement> container;
 	ASSERT_EQ(container.size(), 0);
 
-	container.add(Property<int>("intProp", 2));
+	container.add(Property("intProp", 2));
 	ASSERT_EQ(container.size(), 1);
 
-	auto no_prop = container.add(Property<int>("intProp", 5));
+	auto no_prop = container.add(Property("intProp", 5));
 	ASSERT_EQ(container.size(), 1);
 	ASSERT_EQ(no_prop, nullptr);
 }
@@ -216,18 +215,18 @@ TEST_F(ElementContainerTest, Submodel)
 	ElementContainer<Submodel> container;
 	ASSERT_EQ(container.size(), 0);
 
-   container.add(Submodel("sm", Identifier("test")));
+	container.add(Submodel("sm", Identifier("test")));
 	ASSERT_EQ(container.size(), 1);
 }
 
 TEST_F(ElementContainerTest, Append_1)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ElementContainer<SubmodelElement> container2;
-	container2.add(Property<std::string>("stringProp", "test"));
+	container2.add(Property("stringProp", "test"));
 	container2.add(MultiLanguageProperty("multiLangProp", { {"en","test"},{"de","test"} }));
 
 	ASSERT_EQ(container.size(), 2);
@@ -237,9 +236,9 @@ TEST_F(ElementContainerTest, Append_1)
 
 	ASSERT_EQ(container.size(), 4);
 
-	auto stringProp = container.get<Property<std::string>>("stringProp");
+	auto stringProp = container.get<Property>("stringProp");
 	ASSERT_NE(stringProp, nullptr);
-	ASSERT_EQ(*stringProp->get_value(), "test");
+	ASSERT_EQ(stringProp->get_value_string(), "test");
 
 	auto multiLangProp = container.get<MultiLanguageProperty>("multiLangProp");
 	ASSERT_NE(multiLangProp, nullptr);
@@ -249,30 +248,30 @@ TEST_F(ElementContainerTest, Append_1)
 TEST_F(ElementContainerTest, Append_2)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ElementContainer<SubmodelElement> container2;
-	auto original = container2.add(Property<std::string>("stringProp", "test"));
-	
+	auto original = container2.add(Property("stringProp", "test"));
+
 	container.append(container2);
 
-	auto copy = container.get<Property<std::string>>("stringProp");
-	copy->set_value("edited");
+	auto copy = container.get<Property>("stringProp");
+	copy->assign("edited");
 
-	ASSERT_EQ(copy->get_value(), "edited");
-	ASSERT_EQ(original->get_value(), "test");
+	ASSERT_EQ(copy->get_value_string(), "edited");
+	ASSERT_EQ(original->get_value_string(), "test");
 }
 
 TEST_F(ElementContainerTest, Append_3)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 1));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 1));
+	container.add(Property("intProp2", 2));
 
 	ElementContainer<SubmodelElement> container2;
-	container2.add(Property<int>("intProp2", 42));
-	container2.add(Property<int>("intProp3", 3));
+	container2.add(Property("intProp2", 42));
+	container2.add(Property("intProp3", 3));
 
 	ASSERT_EQ(container.size(), 2);
 	ASSERT_EQ(container2.size(), 2);
@@ -287,7 +286,7 @@ TEST_F(ElementContainerTest, Append_3)
 
 	ASSERT_NE(container.get(1), nullptr);
 	ASSERT_EQ(container.get(1)->getIdShort(), "intProp2");
-	ASSERT_EQ(container.get<Property<int>>(1)->get_value(), 2);
+	ASSERT_EQ(container.get<Property>(1)->get_as<DataTypeDefinition::Int>(), 2);
 
 	ASSERT_NE(container.get(2), nullptr);
 	ASSERT_EQ(container.get(2)->getIdShort(), "intProp3");
@@ -355,8 +354,8 @@ TEST_F(ElementContainerTest, Owner_Move)
 TEST_F(ElementContainerTest, Copy_Operator_1)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ASSERT_EQ(container.size(), 2);
 
@@ -365,60 +364,60 @@ TEST_F(ElementContainerTest, Copy_Operator_1)
 	ASSERT_EQ(container.size(), 2);
 	ASSERT_EQ(container2.size(), 2);
 
-	auto stringProp = container2.get<Property<std::string>>("stringProp");
+	auto stringProp = container2.get<Property>("stringProp");
 	ASSERT_EQ(stringProp, nullptr);
 
 	auto multiLangProp = container.get<MultiLanguageProperty>("multiLangProp");
 	ASSERT_EQ(multiLangProp, nullptr);
 
-	ASSERT_NE(nullptr, container.get<Property<int>>("intProp1"));
-	ASSERT_NE(nullptr, container.get<Property<int>>("intProp2"));
+	ASSERT_NE(nullptr, container.get<Property>("intProp1"));
+	ASSERT_NE(nullptr, container.get<Property>("intProp2"));
 
-	ASSERT_NE(nullptr, container2.get<Property<int>>("intProp1"));
-	ASSERT_NE(nullptr, container2.get<Property<int>>("intProp2"));
+	ASSERT_NE(nullptr, container2.get<Property>("intProp1"));
+	ASSERT_NE(nullptr, container2.get<Property>("intProp2"));
 
-	ASSERT_NE(container.get<Property<int>>("intProp1"), container2.get<Property<int>>("intProp1"));
-	ASSERT_NE(container.get<Property<int>>("intProp2"), container2.get<Property<int>>("intProp2"));
+	ASSERT_NE(container.get<Property>("intProp1"), container2.get<Property>("intProp1"));
+	ASSERT_NE(container.get<Property>("intProp2"), container2.get<Property>("intProp2"));
 }
 
 TEST_F(ElementContainerTest, Copy_Operator_2)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ASSERT_EQ(container.size(), 2);
 
-	const auto & const_ref = container;
+	const auto& const_ref = container;
 	auto container2 = const_ref;
 
 	ASSERT_EQ(container.size(), 2);
 	ASSERT_EQ(container2.size(), 2);
 
-	auto stringProp = container2.get<Property<std::string>>("stringProp");
+	auto stringProp = container2.get<Property>("stringProp");
 	ASSERT_EQ(stringProp, nullptr);
 
 	auto multiLangProp = container.get<MultiLanguageProperty>("multiLangProp");
 	ASSERT_EQ(multiLangProp, nullptr);
 
-	ASSERT_NE(nullptr, container.get<Property<int>>("intProp1"));
-	ASSERT_NE(nullptr, container.get<Property<int>>("intProp2"));
+	ASSERT_NE(nullptr, container.get<Property>("intProp1"));
+	ASSERT_NE(nullptr, container.get<Property>("intProp2"));
 
-	ASSERT_NE(nullptr, container2.get<Property<int>>("intProp1"));
-	ASSERT_NE(nullptr, container2.get<Property<int>>("intProp2"));
+	ASSERT_NE(nullptr, container2.get<Property>("intProp1"));
+	ASSERT_NE(nullptr, container2.get<Property>("intProp2"));
 
-	ASSERT_NE(container.get<Property<int>>("intProp1"), container2.get<Property<int>>("intProp1"));
-	ASSERT_NE(container.get<Property<int>>("intProp2"), container2.get<Property<int>>("intProp2"));
+	ASSERT_NE(container.get<Property>("intProp1"), container2.get<Property>("intProp1"));
+	ASSERT_NE(container.get<Property>("intProp2"), container2.get<Property>("intProp2"));
 }
 
 TEST_F(ElementContainerTest, Copy_Operator_3)
 {
 	ElementContainer<SubmodelElement> container;
-	container.add(Property<int>("intProp1", 2));
-	container.add(Property<int>("intProp2", 2));
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
 
 	ElementContainer<SubmodelElement> container2;
-	container2.add(Property<std::string>("stringProp", "test"));
+	container2.add(Property("stringProp", "test"));
 	container2.add(MultiLanguageProperty("multiLangProp", { {"en","test"},{"de","test"} }));
 
 	ASSERT_EQ(container.size(), 2);
@@ -429,18 +428,61 @@ TEST_F(ElementContainerTest, Copy_Operator_3)
 	ASSERT_EQ(container.size(), 2);
 	ASSERT_EQ(container2.size(), 2);
 
-	auto stringProp = container2.get<Property<std::string>>("stringProp");
+	auto stringProp = container2.get<Property>("stringProp");
 	ASSERT_EQ(stringProp, nullptr);
 
 	auto multiLangProp = container.get<MultiLanguageProperty>("multiLangProp");
 	ASSERT_EQ(multiLangProp, nullptr);
 
-	ASSERT_NE(nullptr, container.get<Property<int>>("intProp1"));
-	ASSERT_NE(nullptr, container.get<Property<int>>("intProp2"));
+	ASSERT_NE(nullptr, container.get<Property>("intProp1"));
+	ASSERT_NE(nullptr, container.get<Property>("intProp2"));
 
-	ASSERT_NE(nullptr, container2.get<Property<int>>("intProp1"));
-	ASSERT_NE(nullptr, container2.get<Property<int>>("intProp2"));
+	ASSERT_NE(nullptr, container2.get<Property>("intProp1"));
+	ASSERT_NE(nullptr, container2.get<Property>("intProp2"));
 
-	ASSERT_NE(container.get<Property<int>>("intProp1"), container2.get<Property<int>>("intProp1"));
-	ASSERT_NE(container.get<Property<int>>("intProp2"), container2.get<Property<int>>("intProp2"));
+	ASSERT_NE(container.get<Property>("intProp1"), container2.get<Property>("intProp1"));
+	ASSERT_NE(container.get<Property>("intProp2"), container2.get<Property>("intProp2"));
 }
+
+TEST_F(ElementContainerTest, Clear_1)
+{
+	ElementContainer<SubmodelElement> container;
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
+	ASSERT_EQ(container.size(), 2);
+
+	container.clear();
+	ASSERT_EQ(container.size(), 0);
+};
+
+TEST_F(ElementContainerTest, Remove_1)
+{
+	ElementContainer<SubmodelElement> container;
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
+
+	// Check pre-conditions
+	ASSERT_EQ(container.size(), 2);
+	ASSERT_TRUE(container.hasEntry("intProp1"));
+
+	// Remove by id, pass
+	ASSERT_TRUE(container.remove("intProp1"));
+	ASSERT_EQ(container.size(), 1);
+	ASSERT_FALSE(container.hasEntry("intProp1"));
+
+	// Remove again, id missing, fail 
+	ASSERT_FALSE(container.remove("intProp1"));
+	ASSERT_FALSE(container.hasEntry("intProp1"));
+	ASSERT_EQ(container.size(), 1);
+};
+
+TEST_F(ElementContainerTest, Remove_2)
+{
+	ElementContainer<SubmodelElement> container;
+	container.add(Property("intProp1", 2));
+	container.add(Property("intProp2", 2));
+	ASSERT_EQ(container.size(), 2);
+
+	container.remove(0);
+	ASSERT_EQ(container.size(), 1);
+};

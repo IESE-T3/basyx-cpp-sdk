@@ -8,7 +8,7 @@
 #include <basyx/asset/assetinformation.h>
 #include <basyx/submodel.h>
 
-#include <basyx/enums/IdentifiableElements.h>
+#include <basyx/enums/DataTypeDefinition.h>
 
 #include <basyx/qualifiable/qualifier.h>
 
@@ -42,55 +42,6 @@ protected:
     }
 };
 
-TEST_F(BaseTest, MinMaxString) {
-   unsigned int min = 1;
-   unsigned int max = 3;
-
-   // Check if min size and content is honored
-   base::MinMaxString mmStr(min, max);
-   std::string s = "";
-   mmStr = s;
-   ASSERT_EQ(min, mmStr.length());
-   std::string cmp;
-   cmp+= base::STRING_PADDING;
-   ASSERT_STREQ(cmp.data(), mmStr.str().data());
-
-   // Check if max size is honored
-   base::MinMaxString mmStr2(min, max);
-   std::string s2;
-   s2.resize(max + 10);
-   mmStr2 = s2;
-   ASSERT_EQ(max, mmStr2.length());
-
-   // check if resizes does the right thing
-   base::MinMaxString mmStr3(min, max);
-   mmStr3.resize(3000);
-   ASSERT_EQ(max, mmStr3.length());
-
-   base::MinMaxString mmStr4(min, max);
-   mmStr4.resize(3000, ' ');
-   ASSERT_EQ(max, mmStr4.length());
-
-   // Lets assign a string and see if it is set correct
-   base::MinMaxString mmStr5(min, max);
-   std::string ste = "te";
-   mmStr5.assign(ste);
-   ASSERT_STREQ(ste.data(), mmStr5.str().data());
-
-}
-
-TEST_F(BaseTest, VersionRevisionType)
-{
-   VersionRevisionType vrt1("22");
-   ASSERT_STREQ("22", vrt1.str().data());
-
-   VersionRevisionType vrt2("Bad");
-   ASSERT_STREQ("0", vrt2.str().data());
-
-   VersionRevisionType vrt3("1234567890");
-   ASSERT_STREQ("1234", vrt3.str().data());
-}
-
 TEST_F(BaseTest, LangStringSet)
 {
     basyx::langstring_t l { "de", "test" };
@@ -115,53 +66,15 @@ TEST_F(BaseTest, LangStringSet)
     ASSERT_EQ(*de, "test");
 }
 
-TEST_F(BaseTest, IdentifierTest)
-{
-   Identifier id("test");
-   ASSERT_EQ("test", id.getId());
-
-   Identifier id2 = id;
-   ASSERT_EQ("test", id2.getId());
-
-   Identifier id3 { "test3" };
-   ASSERT_EQ("test3", id3.getId());
-
-   Identifier id4("test_bad");
-   id4.assign("test_good");
-   ASSERT_EQ("test_good", id4.getId());
-}
-
-TEST_F(BaseTest, AutoKeyType)
-{
-    Key key_1 { "CUSTOM" };
-    Key key_2 { "http://test-key" };
-    Key key_3 { "https://test-key" };
-    Key key_4 { "urn://test-key" };
-    Key key_5 { "0173-1#02-AAR972#002" };
-    Key key_6 { "0173-1#02-AAR972#00" };
-    Key key_7 { "0173-1x02-AAR972#002" };
-
-    ASSERT_EQ(key_1.get_id_type(), KeyType::Custom);
-    ASSERT_EQ(key_2.get_id_type(), KeyType::IRI);
-    ASSERT_EQ(key_3.get_id_type(), KeyType::IRI);
-    ASSERT_EQ(key_4.get_id_type(), KeyType::IRI);
-    ASSERT_EQ(key_5.get_id_type(), KeyType::IRDI);
-    ASSERT_EQ(key_6.get_id_type(), KeyType::Custom);
-    ASSERT_EQ(key_7.get_id_type(), KeyType::Custom);
-};
-
 TEST_F(BaseTest, Reference)
 {
-    Key key { KeyElements::Asset, "test", KeyType::FragmentId };
+    Key key { KeyElements::Asset, "test" };
 
-    Reference reference_1 { key };
+    Reference reference_1{ ReferenceTypes::ExternalReference, key };
     ASSERT_EQ(reference_1.size(), 1);
 
-    Reference reference_2({ KeyElements::AssetAdministrationShell, "test", KeyType::FragmentId });
+    Reference reference_2( ReferenceTypes::ModelReference, { KeyElements::AssetAdministrationShell, "test" });
     ASSERT_EQ(reference_2.size(), 1);
-
-    Reference reference_3 { key, key, key };
-    ASSERT_EQ(reference_3.size(), 3);
 };
 
 TEST_F(BaseTest, MultiLangProp)
@@ -190,15 +103,14 @@ TEST_F(BaseTest, MultiLangProp)
 
 TEST_F(BaseTest, Enum)
 {
-	auto none = IdentifiableElements_::from_string("NONE");
-	ASSERT_FALSE(none);
+	auto none = DataTypeDefinition_::from_string("NONE");
+	ASSERT_EQ(none, DataTypeDefinition::INVALID);
 
-	auto asset = IdentifiableElements_::from_string("Asset");
-	ASSERT_TRUE(asset);
-	ASSERT_EQ(*asset, IdentifiableElements::Asset);
+	auto found = DataTypeDefinition_::from_string("xs:byte");
+	ASSERT_EQ(found, DataTypeDefinition::Byte);
 
-	std::string str = IdentifiableElements_::to_string(IdentifiableElements::AssetAdministrationShell);
-	ASSERT_EQ(str, "AssetAdministrationShell");
+	std::string str = DataTypeDefinition_::to_string(DataTypeDefinition::Base64Binary);
+	ASSERT_EQ(str, "xs:base64Binary");
 };
 
 TEST_F(BaseTest, HasKind)
@@ -233,12 +145,12 @@ TEST_F(BaseTest, SubmodelElementCollection)
 
     MultiLanguageProperty mlp("test");
 
-    Property<int> i { "i" };
-    i.set_value(5);
+    Property i { "i" };
+    i.assign(5);
 
     col.getSubmodelElements().add(i);
 
-    i.set_value(6);
+    i.assign(6);
 
     col.getSubmodelElements().add(std::move(i));
     col.getSubmodelElements().add(mlp);
@@ -254,8 +166,8 @@ TEST_F(BaseTest, SubmodelElementCollection_2)
 {
     SubmodelElementCollection col { "col" };
 
-    Property<int> i1 { "i1", 2 };
-    Property<int> i2 { "i2", 5 };
+    Property i1 { "i1", 2 };
+    Property i2 { "i2", 5 };
 
     col.getSubmodelElements().add(i1);
     col.getSubmodelElements().add(i2);
@@ -266,16 +178,16 @@ TEST_F(BaseTest, SubmodelElementCollection_2)
     auto r1 = col.getSubmodelElements().get("i1");
     ASSERT_NE(r1, nullptr);
 
-    auto r2 = col.getSubmodelElements().get<Property<int>>("i2");
+    auto r2 = col.getSubmodelElements().get<Property>("i2");
     ASSERT_NE(r2, nullptr);
-    ASSERT_EQ(*r2->get_value(), 5);
+    ASSERT_EQ(r2->get_as<DataTypeDefinition::Integer>(), 5);
 };
 
 TEST_F(BaseTest, SubmodelElementCollection_3)
 {
     SubmodelElementCollection col1("col1",
-        Property<int>("i1", 2),
-        Property<float>("f2", 5.0f),
+        Property("i1", 2),
+        Property("f2", 5.0f),
         MultiLanguageProperty("mlp", {
             { "de", "beispiel" },
             { "en", "example" },
@@ -291,8 +203,8 @@ TEST_F(BaseTest, SubmodelElementCollection_3)
 TEST_F(BaseTest, SubmodelElementCollection_CopyConstructor)
 {
     SubmodelElementCollection col1("col1",
-        Property<int>("i1", 2),
-        Property<float>("f2", 5.0f),
+        Property("i1", 2),
+        Property("f2", 5.0f),
         MultiLanguageProperty("mlp", {
             { "de", "beispiel" },
             { "en", "example" },
@@ -318,35 +230,35 @@ TEST_F(BaseTest, Submodel)
 {
 	Submodel sm("sm", "test/sm_1");
 
-    sm.getSubmodelElements().add(Property<int>("p1", 2));
-    sm.getSubmodelElements().add(Property<int>("p2", 3));
+    sm.getSubmodelElements().add(Property("p1", 2));
+    sm.getSubmodelElements().add(Property("p2", 3));
 
-    sm.setSemanticId("custom_submodel");
+    sm.setSemanticId({ ReferenceTypes::ModelReference, { KeyElements::Submodel, "custom_submodel" } });
 }
 
 TEST_F(BaseTest, SubmodelAddElements)
 {
-	using stringProp_t = Property<std::string>;
+	using stringProp_t = Property;
 
    Submodel sm("sm1", Identifier("https://admin-shell.io/cpp#sm1"));
 	sm.setCategory("test");
-	sm.setSemanticId("0173-1#02-AAR972#002");
+    sm.setSemanticId({ ReferenceTypes::ExternalReference, { KeyElements::Submodel, "0173-1#02-AAR972#002" } });
 	sm.setAdministration({ "1.0", "v2" });
 
    Submodel sm2("sm2", Identifier("https://admin-shell.io/cpp#sm2"));
 
-	sm.getSubmodelElements().add(Property<std::string>("testProperty1", "Yay a value!"));
-	sm.getSubmodelElements().add(Property<std::string>("testProperty2", "Values and values! :O"));
+	sm.getSubmodelElements().add(Property("testProperty1", "Yay a value!"));
+	sm.getSubmodelElements().add(Property("testProperty2", "Values and values! :O"));
 
 	ASSERT_EQ(sm.getSubmodelElements().size(), 2);
 
 	auto * elem_1 = sm.getSubmodelElements().get<stringProp_t>("testProperty1");
 	ASSERT_TRUE(elem_1 != nullptr);
-	ASSERT_EQ(*elem_1->get_value(), "Yay a value!");
+	ASSERT_EQ(elem_1->get_as<DataTypeDefinition::String>(), "Yay a value!");
 
 	auto * elem_2 = sm.getSubmodelElements().get<stringProp_t>("testProperty2");
 	ASSERT_TRUE(elem_2 != nullptr);
-	ASSERT_EQ(*elem_2->get_value(), "Values and values! :O");
+	ASSERT_EQ(elem_2->get_as<DataTypeDefinition::String>(), "Values and values! :O");
 }
 
 TEST_F(BaseTest, EntityTest)
@@ -373,7 +285,7 @@ TEST_F(BaseTest, AssetInfTest)
    Identifier id("test");
 	AssetInformation assetInf{ AssetKind::Instance };
 
-   assetInf.setGlobalAssetId(id);
+   assetInf.globalAssetId = id;
 };
 
 TEST_F(BaseTest, AssetAdministrationShell)
@@ -395,7 +307,7 @@ TEST_F(BaseTest, AssetInfoInAas)
 {
       Identifier id("cppTestAsset");
 		AssetInformation assetinfo(basyx::AssetKind::Instance);
-      assetinfo.setGlobalAssetId(id);
+      assetinfo.globalAssetId  = id;
 
 		auto assetInfo2 = assetinfo;
 		AssetAdministrationShell aas("cppAas", "cppAas", assetinfo);

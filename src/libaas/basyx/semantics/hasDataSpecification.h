@@ -33,11 +33,11 @@ public:
    };
 
    void addDataSpecification(Reference dataSpecification) {
-      this->dataSpecification.add(dataSpecification);
+      this->dataSpecification.add(std::move(dataSpecification));
    };
-   void addDataSpecification(util::string_view dataSpecification) {
-      this->dataSpecification.add(dataSpecification);
-   };
+   //void addDataSpecification(util::string_view dataSpecification) {
+   //   this->dataSpecification.add(dataSpecification);
+   //};
 
    void setDataSpecication(ElementVector<Reference> & dataSpecification) {
       this->dataSpecification = std::move(dataSpecification);

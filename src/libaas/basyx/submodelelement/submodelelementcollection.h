@@ -18,6 +18,7 @@ namespace basyx
 	class SubmodelElementCollection :
 		public SubmodelElement,
 		private ModelType<ModelTypes::SubmodelElementCollection>,
+		private Referable::Copyable<SubmodelElementCollection>,
 		private serialization::Serializable<SubmodelElementCollection>
 	{
 	public:

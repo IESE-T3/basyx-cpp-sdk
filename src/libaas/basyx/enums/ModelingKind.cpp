@@ -22,6 +22,9 @@ ModelingKind ModelingKind_::from_string(const std::string & name)
 			return !name.compare(pair.first);
 	});
 
+	if (pair == string_to_enum.end())
+		return ModelingKind::None;
+
     return pair->second;
 }
 

@@ -102,7 +102,7 @@ public:
 	template<typename... Args>
 	void emplace(Args&&... args) {
 		this->reset();
-		new (_internals._data.data()) T(std::forward<Args...>(args...));
+		new (_internals._data.data()) T(std::forward<Args>(args)...);
 		this->_internals._empty = false;
 	};
 

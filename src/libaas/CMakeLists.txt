@@ -2,19 +2,13 @@
 ###               AAS                ###
 ########################################
 
-set (BASYX_AAS_LIB_SHORTNAME "AAS")
+set (BASYX_AAS_LIB_SHORTNAME "basyx_metamodel")
 set (BASYX_AAS_LIBRARY_NAME "${PROJECT_SHORTNAME}${BASYX_AAS_LIB_SHORTNAME}")
 set (BASYX_AAS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include(sources.cmake)
 
-add_library(${BASYX_AAS_LIB_SHORTNAME})
-
-target_sources(${BASYX_AAS_LIB_SHORTNAME}
-	PRIVATE
-		${SOURCE_FILES_BASYX_AAS}
-		${HEADER_FILES_BASYX_AAS}
-)
+add_library(${BASYX_AAS_LIB_SHORTNAME} ${SOURCE_FILES_BASYX} ${HEADER_FILES_BASYX})
 
 set_target_properties(${BASYX_AAS_LIB_SHORTNAME}
    PROPERTIES VERSION ${PROJECT_VERSION}

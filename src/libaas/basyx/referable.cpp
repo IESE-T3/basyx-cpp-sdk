@@ -8,7 +8,7 @@ Referable::Referable(util::string_view idShort)
 	, parent(nullptr)
 {};
 
-util::string_view Referable::getIdShort() const
+const util::optional<std::string>& Referable::getIdShort() const
 {
    return this->idShort;
 }

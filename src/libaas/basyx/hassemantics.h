@@ -11,6 +11,7 @@ class HasSemantics
 {
 private:
 	util::optional<Reference> semanticId;
+	std::vector<Reference> supplementalSemanticIdList;
 public:
 	HasSemantics() = default;
 
@@ -23,10 +24,10 @@ public:
 	~HasSemantics() = default;
 public:
 	const util::optional<Reference> & getSemanticId() const { return this->semanticId; };
-	util::optional<Reference> & getSemanticId() { return this->semanticId; };
+	void setSemanticId(Reference semanticId) { this->semanticId = std::move(semanticId); };
 
-	void setSemanticId(Reference semanticId) { this->semanticId = semanticId; };
-	void setSemanticId(util::string_view semanticId) { this->semanticId = semanticId; };
+	std::vector<Reference> & getSupplementalSemanticIds() { return this->supplementalSemanticIdList; };
+	const std::vector<Reference> & getSupplementalSemanticIds() const { return this->supplementalSemanticIdList; };
 };
 
 };

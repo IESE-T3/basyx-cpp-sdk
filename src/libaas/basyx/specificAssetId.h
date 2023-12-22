@@ -17,29 +17,29 @@ namespace basyx
 
 class SpecificAssetId : public HasSemantics
 {
-private:
-   LabelType name;
-   Identifier value;
-	util::optional<Reference> externalSubjectId;
 public:
-   SpecificAssetId(util::string_view name) : name(name.to_string()) {};
-
-   SpecificAssetId(const SpecificAssetId&) = default;
-   SpecificAssetId(SpecificAssetId&&) = default;
-
-   SpecificAssetId & operator=(const SpecificAssetId&) noexcept = default;
-   SpecificAssetId & operator=(SpecificAssetId&&) noexcept = default;
-
-   ~SpecificAssetId() = default;
+    LabelType name;
+    Identifier value;
+    util::optional<Reference> externalSubjectId;
 public:
-   const std::string getName() const { return name.getLabel(); };
-   void setName(util::string_view name) { this->name = name.to_string(); };
+    SpecificAssetId(util::string_view name) : name(name.to_string()) {};
 
-   const Identifier & getValue() const { return this->value; };
-   void setValue(Identifier value) { this->value = value; }
+    SpecificAssetId(const SpecificAssetId&) = default;
+    SpecificAssetId& operator=(const SpecificAssetId&) = default;
 
-	const util::optional<Reference> & getExternalSubjectId() const { return this->externalSubjectId; };
-	template<typename Ref> void setExternalSubjectId(Ref && ref) { this->externalSubjectId = std::forward<Ref>(ref); };
+    SpecificAssetId(SpecificAssetId&&) noexcept = default;
+    SpecificAssetId& operator=(SpecificAssetId&&) noexcept = default;
+
+    ~SpecificAssetId() = default;
+//public:
+//    const std::string getName() const { return name.getLabel(); };
+//    void setName(util::string_view name) { this->name = name.to_string(); };
+//
+//    const Identifier& getValue() const { return this->value; };
+//    void setValue(Identifier value) { this->value = value; }
+//
+//    const util::optional<Reference>& getExternalSubjectId() const { return this->externalSubjectId; };
+//    template<typename Ref> void setExternalSubjectId(Ref&& ref) { this->externalSubjectId = std::forward<Ref>(ref); };
 };
 };
 

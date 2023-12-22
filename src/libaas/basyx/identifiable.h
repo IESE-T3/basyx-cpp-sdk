@@ -1,7 +1,7 @@
 #pragma once
 
 #include <basyx/administrativeInformation.h>
-#include <basyx/identifier.h>
+#include <basyx/common_types.h>
 #include <basyx/referable.h>
 
 #include <basyx/util/optional/optional.hpp>
@@ -15,10 +15,10 @@ class Identifiable : public Referable
 {
 private:
 	util::optional<AdministrativeInformation> administration;
-   Identifier id;
+	Identifier id;
 public:
-   Identifiable(util::string_view idShort, util::string_view id) : Referable(idShort), id(id) {};
-   Identifiable(util::string_view idShort, Identifier id) : Referable(idShort), id(std::move(id)) {};
+	Identifiable(util::string_view idShort, util::string_view id) : Referable(idShort), id(id) {};
+	Identifiable(util::string_view idShort, Identifier id) : Referable(idShort), id(std::move(id)) {};
 
 	Identifiable(const Identifiable&) = default;
 	Identifiable(Identifiable&&) = default;
@@ -32,8 +32,8 @@ public:
 	util::optional<AdministrativeInformation> & getAdministration() { return administration; };
 	void setAdministration(AdministrativeInformation administrativeInformation) { this->administration = std::move(administrativeInformation); }
 
-   const Identifier & getId() const { return id; };
-   void setId(Identifier id) { this->id = std::move(id); };
+	const Identifier & getId() const { return id; };
+	void setId(Identifier id) { this->id = std::move(id); };
 };
 
 };

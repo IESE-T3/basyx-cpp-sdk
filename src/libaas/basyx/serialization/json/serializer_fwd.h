@@ -1,5 +1,7 @@
 #pragma once
 
+#include <basyx/common_types.h>
+
 #include <nlohmann/json.hpp>
 
 namespace basyx
@@ -10,9 +12,9 @@ namespace basyx
 	class HasSemantics;
 	class HasKind;
 	class Referable;
+	class Resource;
 	class Identifiable;
-	class Identifier;
-   class SpecificAssetId;
+    class SpecificAssetId;
 	class modeltype_base;
 	class AssetAdministrationShell;
 	class MultiLanguageProperty;
@@ -29,8 +31,6 @@ namespace basyx
 	class File;
 	class Blob;
 	class AssetInformation;
-
-	template<typename T>
 	class Property;
 
    template<typename T>
@@ -50,9 +50,10 @@ namespace basyx::serialization::json
 	void serialize_helper(json_t & json, const modeltype_base &);
 	void serialize_helper(json_t & json, const AssetInformation &);
 	void serialize_helper(json_t & json, const Identifier &);
-   void serialize_helper(json_t & json, const SpecificAssetId &);
+    void serialize_helper(json_t & json, const SpecificAssetId &);
 	void serialize_helper(json_t & json, const AdministrativeInformation&);
 	void serialize_helper(json_t & json, const Referable&);
+	void serialize_helper(json_t & json, const Resource&);
 	void serialize_helper(json_t & json, const Identifiable&);
 	void serialize_helper(json_t & json, const Submodel&);
 	void serialize_helper(json_t & json, const ReferenceElement&);
@@ -66,7 +67,5 @@ namespace basyx::serialization::json
 	void serialize_helper(json_t & json, const Blob&);
 	void serialize_helper(json_t & json, const SubmodelElementCollection&);
 	void serialize_helper(json_t & json, const AssetAdministrationShell&);
-
-	template<typename T>
-	void serialize_helper(json_t & json, const Property<T>& prop);
+	void serialize_helper(json_t & json, const Property&);
 };

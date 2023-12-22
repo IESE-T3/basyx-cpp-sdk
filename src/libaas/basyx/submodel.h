@@ -29,40 +29,33 @@ using namespace basyx::base;
 using namespace basyx::serialization::priv;
 	
 class Submodel : 
-   public Identifiable,
-   public HasKind,
-   public HasSemantics,
-   public Qualifiable,
-   public HasDataSpecification,
-   public ModelType<ModelTypes::Submodel>,
-   private Identifiable::Copyable<Submodel>
+	public Identifiable,
+	public HasKind, 
+	public HasSemantics,
+	private ModelType<ModelTypes::Submodel>,
+	private Identifiable::Copyable<Submodel>
 {
 private:
 	ElementContainer<SubmodelElement> submodelElements;
 public:
 	Submodel(util::string_view idShort, util::string_view identifier) : Identifiable(idShort, Identifier(identifier)) {};
-	Submodel(util::string_view idShort, Identifier identifier) : Identifiable(idShort, std::move(identifier)) {};
 public:
-   Submodel(const Submodel &sm) : Identifiable(sm.getIdShort(), std::move(sm.getId().getId())) {
+   Submodel(const Submodel &sm) : Identifiable(*sm.getIdShort(), sm.getId()) {
       this->submodelElements.append(sm.getSubmodelElements());
    };
 
-   Submodel& operator=(const Submodel &sm) {
-      this->Identifiable::setId(sm.getId());
-      this->getIdShort() = sm.getIdShort();
-      this->submodelElements.append(sm.getSubmodelElements());
-      return *this;
-   }
+	Submodel& operator=(const Submodel& sm) = default;
 
-	Submodel(Submodel &&) = default;
-	Submodel& operator=(Submodel &&) = default;
-   Submodel& operator+=(const Submodel& sm) {
-      this->getSubmodelElements().append(sm.getSubmodelElements());
-      return *this;
-   }
+	Submodel(Submodel&&) = default;
+	Submodel& operator=(Submodel&&) = default;
+
+	Submodel& operator+=(const Submodel& sm) {
+		this->getSubmodelElements().append(sm.getSubmodelElements());
+		return *this;
+	}
 public:
-	const ElementContainer<SubmodelElement> & getSubmodelElements() const { return this->submodelElements; };
-	ElementContainer<SubmodelElement> & getSubmodelElements() { return this->submodelElements; };
+	const ElementContainer<SubmodelElement>& getSubmodelElements() const { return this->submodelElements; };
+	ElementContainer<SubmodelElement>& getSubmodelElements() { return this->submodelElements; };
 	void setSubmodelElements(ElementContainer<SubmodelElement> elements) { this->submodelElements = std::move(elements); };
 
    // Identifiable - special purpose

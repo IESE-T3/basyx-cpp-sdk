@@ -14,6 +14,8 @@ enum class AssetKind {
 class AssetKind_
 {
 public:
+    using type_t = AssetKind;
+public:
     static AssetKind from_string(util::string_view str_v);
     static const char * to_string(AssetKind value);
 };

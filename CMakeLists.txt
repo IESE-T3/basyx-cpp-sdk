@@ -32,13 +32,12 @@ message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 message(STATUS "" )
 
 if(NOT BASYX_IS_SUBMODULE)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-set(BASYX_INSTALL_SDK_DEFAULT ON)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    set(BASYX_INSTALL_SDK_DEFAULT ON)
 else()
-set(BASYX_INSTALL_SDK_DEFAULT OFF)
+    set(BASYX_INSTALL_SDK_DEFAULT OFF)
 endif()
 
 ### BaSyx directories ###
@@ -47,12 +46,15 @@ set(BASYX_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(BASYX_TEST_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 ### Build options ###
-set(BASYX_BUILD_TESTS ${BASYX_BUILD_TESTS_DEFAULT} CACHE BOOL "Build unit tests")
+option(BASYX_BUILD_TESTS "Build unit tests" OFF)
+option(BASYX_BUILD_API "Build BaSyx API" ON)
 option(BASYX_VERBOSE_CMAKE_OUTPUT "Show detailed CMake output" ON)
-set(BASYX_INSTALL_SDK ${BASYX_INSTALL_SDK_DEFAULT} CACHE BOOL "Create install instructions for BaSyx SDK")
+option(BASYX_INSTALL_SDK "Create install instructions for BaSyx SDK" OFF)
 
 ### Compiler settings ###
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 ###############################################
 ###           Library Settings              ###
@@ -94,21 +96,26 @@ else()
    if(NOT pugixml_POPULATED)
      FetchContent_Populate(pugixml)
      add_subdirectory(${pugixml_SOURCE_DIR} ${pugixml_BINARY_DIR})
+     set_target_properties(pugixml PROPERTIES FOLDER lib)
+     set_target_properties(pugixml-static PROPERTIES FOLDER lib)
    endif()
 endif()
 
 ### GoogleTest ###
-if(${BASYX_BUILD_TESTS})
+if(BASYX_BUILD_TESTS)
     include(GoogleTest)
-
     FetchContent_Declare(
-      googletest
-      URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-    )
+	    googletest
+	    GIT_REPOSITORY https://github.com/google/googletest
+		GIT_TAG release-1.12.1)
 
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
+    set_target_properties(gmock PROPERTIES FOLDER lib/gtest)
+    set_target_properties(gmock_main PROPERTIES FOLDER lib/gtest)
+    set_target_properties(gtest PROPERTIES FOLDER lib/gtest)
+    set_target_properties(gtest_main PROPERTIES FOLDER lib/gtest)
 endif()
 
 ###############################################
@@ -122,13 +129,25 @@ endif()
 add_subdirectory(src/util)
 add_subdirectory(src/libaas)
 
+if(BASYX_BUILD_API)
+	add_subdirectory(src/api)
+	add_subdirectory(src/http)
+endif()
+
+
 ###############################################
 ###           Test Directory                ###
 ###############################################
 
-if(${BASYX_BUILD_TESTS})
+if(BASYX_BUILD_TESTS)
     include( CTest )
+
     add_subdirectory(tests/tests_libaas)
+    add_subdirectory(tests/tests_json)
+	
+	if(BASYX_BUILD_API)
+		add_subdirectory(tests/tests_api)
+	endif()
 endif()
 
 ###############################################

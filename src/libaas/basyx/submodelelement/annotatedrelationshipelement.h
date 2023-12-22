@@ -17,33 +17,23 @@ class AnnotatedRelationshipElement : public SubmodelElement,
 	private ModelType<ModelTypes::AnnotatedRelationshipElement>,
 	private serialization::Serializable<AnnotatedRelationshipElement>
 {
-private:
+public:
+	using annotation_t = std::unique_ptr<DataElement>;
+	using annotation_list_t = std::vector<annotation_t>;
+public:
 	Reference first;
 	Reference second;
-	util::optional<Reference> annotation;
+	annotation_list_t annotations;
 public:
 	AnnotatedRelationshipElement(util::string_view idShort, Reference first, Reference second);
 
 	AnnotatedRelationshipElement(const AnnotatedRelationshipElement&) = default;
 	AnnotatedRelationshipElement& operator=(const AnnotatedRelationshipElement&) = default;
 
-	AnnotatedRelationshipElement(AnnotatedRelationshipElement&&) = default;
-	AnnotatedRelationshipElement& operator=(AnnotatedRelationshipElement&&) = default;
+	AnnotatedRelationshipElement(AnnotatedRelationshipElement&&) noexcept = default;
+	AnnotatedRelationshipElement& operator=(AnnotatedRelationshipElement&&) noexcept = default;
 
 	~AnnotatedRelationshipElement() = default;
-public:
-	const Reference & getFirst() const { return this->first; };
-	const Reference & getSecond() const { return this->second; };
-	const util::optional<Reference> & getAnnotation() const { return this->annotation; };
-
-	template<typename T>
-	void setFirst(T && reference) { this->first = std::forward<T>(reference); };
-
-	template<typename T>
-	void setSecond(T && reference) { this->second = std::forward<T>(reference); };
-
-	template<typename T>
-	void setAnnotation(T && reference) { this->annotation = std::forward<T>(reference); };
 };
 
 }

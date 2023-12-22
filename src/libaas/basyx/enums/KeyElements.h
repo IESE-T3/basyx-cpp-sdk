@@ -38,6 +38,8 @@ enum class KeyElements {
 class KeyElements_
 {
 public:
+    using type_t = KeyElements;
+public:
     static KeyElements from_string(util::string_view name);
     static const char * to_string(KeyElements value);
 };

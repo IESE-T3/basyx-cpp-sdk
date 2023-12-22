@@ -57,12 +57,12 @@ TEST_F(CopyableTest, TestBase)
 
 TEST_F(CopyableTest, TestProperty)
 {
-	Property<std::string> stringProp("stringProp");
-	stringProp.set_value("test");
+	Property stringProp("stringProp");
+	stringProp.assign("test");
 
-	auto copy = stringProp.copy<Property<std::string>>();
+	auto copy = stringProp.copy<Property>();
 	ASSERT_EQ(copy->getIdShort(), stringProp.getIdShort());
-	ASSERT_EQ(copy->get_value(), stringProp.get_value());
+	ASSERT_EQ(copy->get_value_string(), stringProp.get_value_string());
 }
 
 TEST_F(CopyableTest, TestSameType)

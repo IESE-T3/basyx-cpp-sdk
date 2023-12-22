@@ -22,7 +22,7 @@ public:
 	using elementConstIterator_t = typename elementList_t::const_iterator;
 private:
 	elementList_t elementList;
-	Referable * owner;
+	Referable* owner{ nullptr };
 private:
 	void _insert_variadic() { };
 
@@ -94,6 +94,15 @@ public:
 	ElementType* const get(std::size_t index);
 	const ElementType* const get(std::size_t index) const;
 public:
+	// Clear whole container
+	void clear();
+
+	// Remove element by idShort
+	bool remove(util::string_view idShort);
+
+	// Remove element by index
+	bool remove(std::size_t index);
+public:
 	// Get typed element by idShort
 	template<typename T> T* const get(util::string_view idShort) { return dynamic_cast<T*>(get(idShort)); };
 	template<typename T> const T* const get(util::string_view idShort) const { return dynamic_cast<const T*>(get(idShort)); };
@@ -111,7 +120,7 @@ public:
 		if (!element)
 			return nullptr;
 
-		if (this->hasEntry(element->getIdShort()))
+		if (this->hasEntry(*element->getIdShort()))
 			return nullptr;
 		auto ptr = element.get();
 		ptr->Referable::setParent(this->owner);
@@ -142,7 +151,8 @@ template<typename ElementType>
 inline bool ElementContainer<ElementType>::hasEntry(util::string_view idShort)
 {
 	for (const auto & entry : elementList)
-		if (entry->getIdShort() == idShort)
+		// Assume every contained element has an idShort
+		if (*entry->getIdShort() == idShort)
 			return true;
 
 	return false;
@@ -152,7 +162,7 @@ template<typename ElementType>
 inline const ElementType* const ElementContainer<ElementType>::get(util::string_view idShort) const
 {
 	auto ret = std::find_if(elementList.begin(), elementList.end(),
-		[&idShort](const elementEntry_t & element) { return element->getIdShort() == idShort; });
+		[&idShort](const elementEntry_t & element) { return *element->getIdShort() == idShort; });
 
 	if (ret != elementList.end())
 		return ret->get();
@@ -164,7 +174,7 @@ template<typename ElementType>
 inline ElementType* const ElementContainer<ElementType>::get(util::string_view idShort)
 {
 	auto ret = std::find_if(elementList.begin(), elementList.end(),
-		[&idShort](const elementEntry_t & element) { return element->getIdShort() == idShort; });
+		[&idShort](const elementEntry_t & element) { return *element->getIdShort() == idShort; });
 
 	if (ret != elementList.end())
 		return ret->get();
@@ -188,6 +198,37 @@ inline const ElementType * const ElementContainer<ElementType>::get(std::size_t 
 		return nullptr;
 
 	return this->elementList.at(n).get();
+};
+
+template<typename ElementType>
+inline void ElementContainer<ElementType>::clear() 
+{
+	this->elementList.clear();
+};
+
+template<typename ElementType>
+inline bool ElementContainer<ElementType>::remove(util::string_view idShort)
+{
+	auto ret = std::find_if(elementList.begin(), elementList.end(),
+		[&idShort](const elementEntry_t& element) { return *element->getIdShort() == idShort; });
+
+	if (ret != elementList.end()) {
+		this->elementList.erase(ret);
+		return true;
+	};
+
+	return false;
+};
+
+template<typename ElementType>
+inline bool ElementContainer<ElementType>::remove(std::size_t n)
+{
+	if (n > this->elementList.size()) {
+		return false;
+	}
+
+	this->elementList.erase(elementList.begin() + n);
+	return true;
 };
 
 };

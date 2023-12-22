@@ -2,30 +2,33 @@
 ###             util                 ###
 ########################################
 
-set (BASYX_UTIL_LIB_SHORTNAME "Util")
+set (BASYX_UTIL_LIB_SHORTNAME "basyx_util")
 
 set (BASYX_UTIL_LIBRARY_NAME "${PROJECT_SHORTNAME}${BASYX_UTIL_LIB_SHORTNAME}")
 
 set (BASYX_UTIL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library(${BASYX_UTIL_LIB_SHORTNAME})
+add_library(${BASYX_UTIL_LIB_SHORTNAME} STATIC)
 
 set_target_properties(${BASYX_UTIL_LIB_SHORTNAME}
    PROPERTIES VERSION ${PROJECT_VERSION}
 )
 
-#set_target_properties(${BASYX_UTIL_LIB_SHORTNAME}
-#   PROPERTIES SOVERSION ${BASYX_PACKAGE_VERSION_MAJOR}
-#)
 set_target_properties(${BASYX_UTIL_LIB_SHORTNAME}
    PROPERTIES PREFIX "${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_SHORTNAME}"
 )
 
+include("sources.cmake")
+
 target_sources(${BASYX_UTIL_LIB_SHORTNAME}
    PRIVATE
+   ${SOURCE_FILES_UTIL}
 )
 
-add_subdirectory(basyx/util)
+target_sources(${BASYX_UTIL_LIB_SHORTNAME}
+   PRIVATE
+   ${HEADER_FILES_UTIL}
+)
 
 target_include_directories(${BASYX_UTIL_LIB_SHORTNAME}
    PUBLIC

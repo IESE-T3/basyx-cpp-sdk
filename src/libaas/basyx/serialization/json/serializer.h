@@ -44,21 +44,6 @@ namespace basyx::serialization::json
 		serialize_helper_h<HasSemantics>(json, submodelElement);
 	};
 
-	template<typename T>
-	inline void serialize_helper(json_t & json, const Property<T> & property)
-	{
-		serialize_submodelelement_helper(json, property);
-		//serialize_helper(json, static_cast<const SubmodelElement&>(multiLangProperty));
-
-		if (property.get_value())
-			json["value"] = *property.get_value();
-
-		if (property.get_value_id())
-			json["valueId"] = serialize(*property.get_value_id());
-
-		json["valueType"] = property.get_value_type().to_string();
-	};
-
 
 	inline json_t serialize(const serializable_base & serializable)
 	{

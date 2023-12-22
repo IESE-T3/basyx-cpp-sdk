@@ -7,7 +7,7 @@ namespace basyx
 class HasKind
 {
 private:
-   ModelingKind kind = ModelingKind::Instance;
+   ModelingKind kind = ModelingKind::None;
 public:
    void setKind(ModelingKind kind) { this->kind = kind; }
    const ModelingKind getKind() const { return kind; }

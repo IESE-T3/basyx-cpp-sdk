@@ -6,11 +6,6 @@
 
 namespace basyx
 {
-
-	bool SubmodelElementHelper::IsProperty(const SubmodelElement& ele) {
-		return SubmodelElement::is_element_type<property_base>(&ele);
-	};
-
 	bool SubmodelElementHelper::IsMultiLanguageProperty(const SubmodelElement& ele) {
 		return SubmodelElement::is_element_type<MultiLanguageProperty>(&ele);
 	};
@@ -19,5 +14,7 @@ namespace basyx
 		return SubmodelElement::is_element_type<SubmodelElementCollection>(&ele);
 	};
 
-
+	bool SubmodelElementHelper::IsProperty(const SubmodelElement& ele) {
+		return SubmodelElement::is_element_type<Property>(&ele);
+	};
 };

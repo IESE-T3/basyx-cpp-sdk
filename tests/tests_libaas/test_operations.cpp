@@ -44,13 +44,13 @@ TEST_F(OperationTest, Operation)
 	Operation op{ "test_operation" };
 
 	op.inputVariables() = {
-		OperationVariable::Create<Property<int>>("a", {"de", "Erste Eingangsbelegung für Umdrehungszahlmesser"}),
-		OperationVariable::Create<Property<int>>("b", {"de", "Zweite Eingangsbelegung für Umdrehungszahlmesser"}),
+		OperationVariable::Create<Property>("a", {"de", "Erste Eingangsbelegung für Umdrehungszahlmesser"}),
+		OperationVariable::Create<Property>("b", {"de", "Zweite Eingangsbelegung für Umdrehungszahlmesser"}),
 	};
 
 	op.outputVariables() = {
-		OperationVariable::Create<Property<int>>("umdrehungszahl", {"de", "Gemessene Umdrehungszahl des Geräts"}),
-		OperationVariable::Create<Property<float>>("winkel", {"de", "Endwinkel des Geräts"}),
+		OperationVariable::Create<Property>("umdrehungszahl", {"de", "Gemessene Umdrehungszahl des Geräts"}),
+		OperationVariable::Create<Property>("winkel", {"de", "Endwinkel des Geräts"}),
 	};
 
 	ASSERT_EQ(op.inputVariables().size(), 2);
@@ -62,16 +62,16 @@ TEST_F(OperationTest, Operation)
 		ElementContainer<SubmodelElement>& inout,
 		ElementContainer<SubmodelElement> & output) -> bool {
 			// Extract input parameters from input list
-			int a = *input.get<Property<int>>("a")->get_value();
-			int b = *input.get<Property<int>>("b")->get_value();
+			int a = input.get<Property>("a")->get_as<DataTypeDefinition::Int>();
+			int b = input.get<Property>("b")->get_as<DataTypeDefinition::Int>();
 
 			// Call the actual function
 			auto rpm = measure_rpm(a, b);
 			auto angle = measure_angle(a, b);
 
 			// Set output variables
-			output.get<Property<int>>("umdrehungszahl")->set_value(rpm);
-			output.get<Property<float>>("winkel")->set_value(angle);
+			output.get<Property>("umdrehungszahl")->assign(rpm);
+			output.get<Property>("winkel")->assign(angle);
 
 			// Return invokation result
 			return true;
@@ -79,8 +79,8 @@ TEST_F(OperationTest, Operation)
 
 	// Invoke the operation
 	auto input = ElementContainer<SubmodelElement>{
-		Property<int>("a", 4), 
-		Property<int>("b", 2)
+		Property("a", 4), 
+		Property("b", 2)
 	};
 
 	auto inout = ElementContainer<SubmodelElement>{};
@@ -95,6 +95,6 @@ TEST_F(OperationTest, Operation)
 
 	ASSERT_EQ(invoke_result, true);
 
-	ASSERT_EQ(*output.get<Property<int>>("umdrehungszahl")->get_value(), 4*2);
-	ASSERT_EQ(*output.get<Property<float>>("winkel")->get_value(), 100.0f);
+	ASSERT_EQ(output.get<Property>("umdrehungszahl")->get_as<DataTypeDefinition::Int>(), 4*2);
+	ASSERT_EQ(output.get<Property>("winkel")->get_as<DataTypeDefinition::Float>(), 100.0f);
 };
